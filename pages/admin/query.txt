@@ -1,0 +1,32 @@
+SELECT
+*
+FROM
+  transaksi_bulan
+	
+GROUP BY 
+	bulan
+	HAVING bulan ="lunas"
+#WHERE bulan IN(
+# SELECT bulan 
+# FROM transaksi_bulan
+# group by bulan
+# having count(bulan) > 1 and status="lunas"
+
+
+
+
+
+SELECT
+  `transaksi_bulan_dibayar`.`bulan`
+FROM
+  `transaksi_kos`
+  INNER JOIN `transaksi_pembayaran` ON `transaksi_kos`.`kode_t_kamar` =
+`transaksi_pembayaran`.`kode_t_kamar`
+  INNER JOIN `transaksi_bulan_dibayar` ON `transaksi_pembayaran`.`kode_bayar` =
+`transaksi_bulan_dibayar`.`kode_bayar`
+WHERE `transaksi_bulan_dibayar`.`bulan` IN(
+ SELECT `transaksi_bulan_dibayar`.`bulan`
+ FROM `transaksi_bulan_dibayar`
+GROUP BY `transaksi_bulan_dibayar`.`bulan`
+ having count(bulan) > 1 and status="lunas"
+ )

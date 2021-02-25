@@ -1,5 +1,10 @@
 <?php 
+session_start(); 
 require 'functions.php';
+if (!isset($_SESSION["level"])=="superadmin") {
+	header("Location: ../login.php");
+  exit;
+  }
 $kas=tampil_data ("SELECT * FROM kas ORDER BY tgl_input");	
  
 ?>
@@ -9,7 +14,7 @@ $kas=tampil_data ("SELECT * FROM kas ORDER BY tgl_input");
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AdminLTE 3 | DataTables</title>
+  <title>Aplikasi Rumah Sewaku</title>
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -89,7 +94,7 @@ $kas=tampil_data ("SELECT * FROM kas ORDER BY tgl_input");
                   <?php foreach($kas as $data) : ?>
                   <tr>
                     <td><?= $i; ?></td>
-                   <td> <?= $data['tgl_input']; ?></td>
+                   <td> <?= tgl_indo($data['tgl_input']); ?></td>
                     <?php if ($data['keterangan']=='') : ?>
                       <td>-</td>
                     <?php else : ?>
@@ -99,13 +104,16 @@ $kas=tampil_data ("SELECT * FROM kas ORDER BY tgl_input");
                    <td><?php echo"Rp.".number_format($data['sisa_kas']).",-"; ?></td>
                    <?php
                     ?>
-                    <td>
+
                    <?php  
-                    @$total +=    $data['sisa_kas'] ; 
-                    echo"Rp.".number_format($total).",-";  
-                   ?>
-                   </td>
-                  </tr>
+                    // Check apakah jenisnya bertambah atau berkurang
+                     if ($data['jenis']== "Bertambah") :   @$total +=$data['sisa_kas'] ;  ?>
+                        <td style="font-weight: bold; color: green;"> <?php echo"Rp.".number_format($total).",-";   ?> </td>
+                     <?php else: @$total -= $data['sisa_kas'] ;  ?>
+                        <td style="font-weight: bold; color: red;"> <?php echo"Rp.".number_format($total).",-";   ?> </td>
+                     <?php endif; ?>
+                   
+                    </tr>
                   <?php $i++ ?>
                   <?php 
                       $array[] = $total;

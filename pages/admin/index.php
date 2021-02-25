@@ -1,12 +1,19 @@
 <?php 
 session_start();
-
 if (!isset($_SESSION["level"])=="superadmin") {
 	header("Location: ../login.php");
   exit;
   }
   require 'functions.php';
 
+$pelanggan =tampil_data ("SELECT *  FROM pelanggan");	 
+$count_pelanggan =count($pelanggan);
+
+$pemasukan =tampil_data ("SELECT sum(jumlah_bayar) AS pemasukan  FROM transaksi_pembayaran")[0];	 
+ 
+$pengeluaran =tampil_data ("SELECT sum(jumlah_pengeluaran) AS pengeluaran FROM transaksi_pengeluaran")[0];
+
+$setoran =tampil_data ("SELECT sum(jumlah_store) AS setoran FROM setoran_owner")[0];
 ?>
 
 <!DOCTYPE html>
@@ -14,7 +21,7 @@ if (!isset($_SESSION["level"])=="superadmin") {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Rumah Sewaku</title>
+  <title>Aplikasi Rumah Sewaku</title>
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -76,13 +83,13 @@ if (!isset($_SESSION["level"])=="superadmin") {
             <!-- small box -->
             <div class="small-box bg-info">
               <div class="inner">
-                <h3>150</h3>
+                <h3><?= $count_pelanggan; ?></h3>
                 <p>Pelanggan</p>
               </div>
               <div class="icon">
                 <i class="ion ion-bag"></i>
               </div>
-              <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              <a href="pelanggan.php" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
           </div>
           <!-- ./col -->
@@ -90,13 +97,13 @@ if (!isset($_SESSION["level"])=="superadmin") {
             <!-- small box -->
             <div class="small-box bg-success">
               <div class="inner">
-                <h3>53<sup style="font-size: 20px">%</sup></h3>
-                <p>Pemasukan</p>
+                <h3><?=  "Rp.".number_format($pemasukan['pemasukan']).",-"; ?></h3>
+                <p>Pemasukan Kos</p>
               </div>
               <div class="icon">
                 <i class="ion ion-stats-bars"></i>
               </div>
-              <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              <a href="transaksi_pembayaran.php" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
           </div>
           <!-- ./col -->
@@ -104,14 +111,13 @@ if (!isset($_SESSION["level"])=="superadmin") {
             <!-- small box -->
             <div class="small-box bg-warning">
               <div class="inner">
-                <h3>44</h3>
-
+                <h3><?=  "Rp.".number_format($pengeluaran['pengeluaran']).",-"; ?></h3>
                 <p>Pengeluaran</p>
               </div>
               <div class="icon">
                 <i class="ion ion-person-add"></i>
               </div>
-              <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              <a href="transaksi_pengeluaran.php" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
           </div>
           <!-- ./col -->
@@ -119,13 +125,13 @@ if (!isset($_SESSION["level"])=="superadmin") {
             <!-- small box -->
             <div class="small-box bg-danger">
               <div class="inner">
-                <h3>65</h3>
+                <h3><?=  "Rp.".number_format($setoran['setoran']).",-"; ?></h3>
                 <p>Setoran</p>
               </div>
               <div class="icon">
                 <i class="ion ion-pie-graph"></i>
               </div>
-              <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              <a href="setoran.php" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
           </div>
           <!-- ./col -->
@@ -266,6 +272,8 @@ if (!isset($_SESSION["level"])=="superadmin") {
     </section>
     <!-- /.content -->
   </div>
+  
+
   
   <!-- footer -->
   <?php include "footer.php" ?>

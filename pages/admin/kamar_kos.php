@@ -1,5 +1,10 @@
 <?php 
+session_start(); 
 require 'functions.php';
+if (!isset($_SESSION["level"])=="superadmin") {
+	header("Location: ../login.php");
+  exit;
+  }
 $kamar_kos=tampil_data ("SELECT * FROM kamar_kos JOIN kategori_kos ON kamar_kos.kode_kategori=
                             kategori_kos.kode_kategori ORDER BY kategori_kos");	
 // cek apakah tombol submit sudah ditekan atau belum
@@ -27,7 +32,7 @@ if (isset($_POST["submit"])) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Rumah Sewaku</title>
+  <title>Aplikasi Rumah Sewaku</title>
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -111,7 +116,7 @@ if (isset($_POST["submit"])) {
                 <div class="card-body">
                 <div class="form-group">             
                     <label for="sumber">Nomor Kamar</label>
-                    <input type="text"  name="kode_kamar" class="form-control" placeholder="Masukkan Nomor Kamar" required="required" autocomplete="off">
+                    <input type="text"  name="kode_kamar" class="form-control" placeholder="Di isi hanya nomor kamarnya saja"   required  autocomplete='0' >
                   </div> 
                <div class="form-group">             
                     <label for="sumber">Kategori Kos</label>

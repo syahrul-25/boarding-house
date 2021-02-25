@@ -1,12 +1,15 @@
-<?php 
+<?php
+session_start(); 
+if (!isset($_SESSION["level"])=="superadmin") {
+	header("Location: ../login.php");
+  exit;
+  }
 require 'functions.php';
-$akun=tampil_data ("SELECT * FROM akun ORDER BY level");	
+$akun=tampil_data ("SELECT * FROM akun ORDER BY level = 'superadmin '  ASC");	
 // cek apakah tombol submit sudah ditekan atau belum
 if (isset($_POST["submit"])) {
-
   // cek apakah berhasil di tambahkan atau tidak
  if (registrasi ($_POST) > 0) {
- 
  
    echo "<script> 
        alert('Data Berhasil Ditambahkan!');
@@ -20,9 +23,6 @@ if (isset($_POST["submit"])) {
  } 
 }
  
- 
-
- 
 ?>
 
 <!DOCTYPE html>
@@ -30,7 +30,7 @@ if (isset($_POST["submit"])) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Rumah Sewaku</title>
+  <title>Aplikasi Rumah Sewaku</title>
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -186,7 +186,11 @@ $kodeAkun = $huruf . sprintf("%03s", $urutan);
                     <td><?= $i; ?></td>
                     <td> <?= $data['nama']; ?></td>
                     <td> <?= $data['email']; ?></td>
+                  <?php if ($data['level']=='superadmin') : ?>
+                     <td>Pengelola</td>
+                   <?php else: ?>
                     <td> <?= $data['level']; ?></td>
+                   <?php endif; ?> 
                     
                     <?php if ($data['status']==1) : ?>
                   

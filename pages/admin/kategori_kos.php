@@ -1,6 +1,11 @@
 <?php 
+session_start(); 
 require 'functions.php';
-$kategori_kos=tampil_data ("SELECT * FROM kategori_kos");	
+if (!isset($_SESSION["level"])=="superadmin") {
+	header("Location: ../login.php");
+  exit;
+  }
+$kategori_kos = tampil_data("SELECT * FROM kategori_kos ORDER BY kategori_kos ");
 // cek apakah tombol submit sudah ditekan atau belum
 if (isset($_POST["submit"])) {
 
@@ -26,7 +31,7 @@ if (isset($_POST["submit"])) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AdminLTE 3 | DataTables</title>
+  <title>Aplikasi Rumah Sewaku</title>
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -114,12 +119,8 @@ if (isset($_POST["submit"])) {
                   <button type="submit" name="submit" class="btn btn-primary">Simpan</button>
                 </div>
               </form>
-                       
                </div>
-                     
-                     
-                   
-                  </div>
+            </div>
                   <!-- /.modal-dialog -->
                 </div>
                 <!-- /.modal -->
@@ -148,7 +149,6 @@ if (isset($_POST["submit"])) {
                   <?php $i++ ?>
                   <?php endforeach; ?>
                   </tbody>
-                   
                 </table>
               </div>
               <!-- /.card-body -->

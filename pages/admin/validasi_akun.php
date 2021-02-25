@@ -1,5 +1,10 @@
 <?php 
+session_start(); 
 require 'functions.php';
+if (!isset($_SESSION["level"])=="superadmin") {
+	header("Location: ../login.php");
+  exit;
+  }
 
 // ambil data di URL 
 $kode_akun = $_GET['kode_akun'];

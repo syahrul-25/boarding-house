@@ -1,5 +1,10 @@
 <?php 
+session_start(); 
 require 'functions.php';
+if (!isset($_SESSION["level"])=="superadmin") {
+	header("Location: ../login.php");
+  exit;
+  }
 $pelanggan=tampil_data ("SELECT * FROM pelanggan Join akun ON pelanggan.kode_akun = akun.kode_akun 
                           WHERE statuss = 1 Order By nama ASC");	
                           
@@ -80,7 +85,6 @@ if (isset($_POST["submit"])) {
         <div class="row">
           <div class="col-12">
             <div class="card">
-          
             </div>
             <!-- /.card -->
               <div class="card">
@@ -89,12 +93,8 @@ if (isset($_POST["submit"])) {
               </div>
               <!-- /.card-header -->
               <div class="card-body">
-          
-             
-              <div class="card-body">
-                <table id="dataTable" class="table table-bordered table-striped">
+              <table id="dataTable" class="table table-bordered table-striped">
                   <thead style="text-align: center;">
-              
                     <th>No</th>
                     <th>Nama</th>
                     <th>Jenis Kelamin</th>
@@ -146,7 +146,6 @@ if (isset($_POST["submit"])) {
                         </div>
                        <!-- end modal keterangan -->
                     </td>
-
                     <td>                     
                       <a class="btn btn-primary " href="#"   data-placement="top" title="KTP" data-toggle="modal" data-target="#modal-lg_ktp<?php echo $data['kode_pelanggan']; ?>"> <i class="fa fa-info-circle" aria-hidden="true"></i></a>
                        <!-- modal keterangan -->          
@@ -180,7 +179,6 @@ if (isset($_POST["submit"])) {
                   <?php $i++ ?>
                   <?php endforeach; ?>
                   </tbody>
-                   
                 </table>
               </div>
               <!-- /.card-body -->

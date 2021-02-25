@@ -330,6 +330,96 @@ function validasi($data)
 }
 
 // Function Pelanggan
+function tambah_pelanggan($data)
+{
+	global $conn;
+	// ambil data dari tiap elemen dalam form 
+	$kode_akun = htmlspecialchars($data['kode_akun']);
+	$kode_pelanggan = htmlspecialchars($data['kode_pelanggan']);
+	$no_hp = htmlspecialchars($data['no_hp']);
+	$tgl_daftar = date('Y-m-d');
+	$jk = htmlspecialchars($data['jk']);
+
+
+	$foto_diri = upload_foto_diri();
+	$ktp = upload_ktp();
+
+	// query insert data 
+	$query = "INSERT INTO pelanggan Values 
+				('$kode_pelanggan','$kode_akun','$jk','$no_hp', '$foto_diri', '$ktp', '$tgl_daftar', 0 )";
+
+
+
+
+
+	mysqli_query($conn, $query);
+	return mysqli_affected_rows($conn);
+}
+
+function upload_foto_diri()
+{
+
+	$namaFile = $_FILES['foto_diri']['name'];
+	$ukuranFile = $_FILES['foto_diri']['size'];
+	$errorFile = $_FILES['foto_diri']['error'];
+	$tmpFile = $_FILES['foto_diri']['tmp_name'];
+
+	//cek apakah file yang diuopload adalah gambar
+	$ekstensiGambarValid = ['jpg', 'jpeg', 'png',];
+	$ekstensiGambar = explode('.', $namaFile);
+	$ekstensiGambar = strtolower(end($ekstensiGambar));
+	if (!in_array($ekstensiGambar, $ekstensiGambarValid)) {
+
+		return false;
+	}
+
+	// cek jika ukurannya terlalu besar 
+	if ($ukuranFile >  1000000) {
+		echo "<script> alert ('Ukuran Gambar Terlalu Besar!!!');
+				  </script>";
+		return false;
+	}
+
+	//lolos pengecekan gambar siap di upload 
+
+	//generate nama file baru
+	$foto_gambar = addslashes(file_get_contents($_FILES['foto_diri']['tmp_name']));;
+
+	return $foto_gambar;
+}
+
+function upload_ktp()
+{
+
+	$namaFile = $_FILES['ktp']['name'];
+	$ukuranFile = $_FILES['ktp']['size'];
+	$errorFile = $_FILES['ktp']['error'];
+	$tmpFile = $_FILES['ktp']['tmp_name'];
+
+	//cek apakah file yang diuopload adalah gambar
+	$ekstensiGambarValid = ['jpg', 'jpeg', 'png',];
+	$ekstensiGambar = explode('.', $namaFile);
+	$ekstensiGambar = strtolower(end($ekstensiGambar));
+	if (!in_array($ekstensiGambar, $ekstensiGambarValid)) {
+
+		return false;
+	}
+
+	// cek jika ukurannya terlalu besar 
+	if ($ukuranFile >  1000000) {
+		echo "<script> alert ('Ukuran Gambar Terlalu Besar!!!');
+				  </script>";
+		return false;
+	}
+
+	//lolos pengecekan gambar siap di upload 
+
+	//generate nama file baru
+	$ktp_gambar = addslashes(file_get_contents($_FILES['ktp']['tmp_name']));;
+
+	return $ktp_gambar;
+}
+
 function hapus_pelanggan($kode_pelanggan)
 {
 	global $conn;
@@ -404,13 +494,12 @@ function tambah_transaksi_pembayaran($data)
 	$jumlah_bayar = htmlspecialchars($data['jumlah_bayar']);
 	$keterangan =   htmlspecialchars($data['keterangan']);
 	$kode_bayar =   htmlspecialchars($data['kode_bayar']);
-	$bulan_sekarang = htmlspecialchars($data['bulan']);
+	$bulan_sekarang =   htmlspecialchars($data['bulan']);
 	$tahun =   htmlspecialchars($data['tahun']);
 	$kode_kas =   htmlspecialchars($data['kode_kas']);
 	$tgl_input =   htmlspecialchars($data['tgl_input']);
 	$nama_pelanggan =   htmlspecialchars($data['nama_pelanggan']);
 	$kode_kamar =   htmlspecialchars($data['kode_kamar']);
-	$nama_penginput = htmlspecialchars($data['penghuni']);
 
 	// pecahkan bulan
 	$bulan_pecah = explode("-", $bulan_sekarang);
@@ -423,9 +512,11 @@ function tambah_transaksi_pembayaran($data)
 	$harga = tampil_data("SELECT harga FROM kamar_kos JOIN transaksi_kos ON transaksi_kos.kode_kamar = kamar_kos.kode_kamar Where kode_t_kamar = '$kode_t_kamar'")[0];
 	$harga_kamar = $harga['harga'];
 
+
 	// Tambah kas
 	$jenis = 'Bertambah';
 	$sisa_kas = $jumlah_bayar;
+
 
 	$bulan_utang = $conn->query("SELECT
 			`transaksi_bulan_dibayar`.`bulan`,
@@ -440,9 +531,23 @@ function tambah_transaksi_pembayaran($data)
 			and `transaksi_bulan_dibayar`.`status` = 'belum lunas'
 			ORDER BY kode_t_bulan DESC LIMIT 1");
 
+
+
 	if ($keterangan == "") {
 
 		// ambil bulan terkahir pembayaran
+
+		/**
+		 * $kode_t_kamar
+		 * $bulan_sekarang,
+		 * $jumlah_bayar,
+		 * $bulan_utang,
+		 * $harga_kamar
+		 */
+
+
+		$ketenrangann = generateKeterangan_Transaksi();
+
 		$query = $conn->query("SELECT
 				`transaksi_bulan_dibayar`.`bulan`
 				FROM
@@ -464,8 +569,8 @@ function tambah_transaksi_pembayaran($data)
 			$bulan_terakhir = $bulan_sekarang;
 		}
 
-		$jumlah_pembayaran = $jumlah_bayar;
 
+		$jumlah_pembayaran = $jumlah_bayar;
 		// cek ada bulan yang belum lunas
 		if ($bulan_utang->num_rows > 0) {
 			$result = $bulan_utang->fetch_assoc();
@@ -525,13 +630,10 @@ function tambah_transaksi_pembayaran($data)
 	$query_kas = "INSERT INTO kas Values 
 	('$kode_kas','$sisa_kas','$tgl_input','$keterangann','$jenis')";
 	mysqli_query($conn, $query_kas);
-
 	// QUERY INSERT TRANSAKSI PEMBAYARAN
 	$query1 = "INSERT INTO transaksi_pembayaran Values 
-	('$kode_bayar',$kode_t_kamar,'$kode_kas','$tgl_bayar','$nama_pelanggan','$nama_penginput','$kode_kamar','$metode_bayar','$bukti',$jumlah_bayar,'$keterangann')";
+	('$kode_bayar','$kode_t_kamar','$kode_kas','$kode_akun','$tgl_bayar','$metode_bayar','$bukti','$jumlah_bayar','$keterangann')";
 	mysqli_query($conn, $query1);
-
-	
 
 	// ambil bulan yang belum lunas
 	$bulan_belum_lunas = $conn->query("SELECT
@@ -568,10 +670,6 @@ function tambah_transaksi_pembayaran($data)
 		$conn->query("INSERT INTO transaksi_bulan_dibayar Values 
 				('','$kode_bayar','$tahun_berjalan','$bulan', '$lunasi','lunas', '$keterangan')");
 		$uang_sisa = $jumlah_bayar - $sisa_hutang;
-
-		// Hapus hutang jika sudah dibayar 
-		$query_hapus_hutang  = "DELETE FROM transaksi_bulan_dibayar WHERE bulan= '$bulan' and status = 'belum lunas'";
-		mysqli_query($conn, $query_hapus_hutang);
 	} else {
 
 		// Check bulan berjalan
@@ -778,5 +876,201 @@ function hapus_transaksi_bulan_dibayar($kode_t_bulan)
 {
 	global $conn;
 	mysqli_query($conn, "DELETE FROM transaksi_bulan_dibayar WHERE kode_t_bulan= '$kode_t_bulan'");
+	return mysqli_affected_rows($conn);
+}
+
+// Function pengeluaran
+function tambah_transaksi_pengeluaran($data)
+{
+	global $conn;
+	// ambil data dari tiap elemen dalam form 
+	$kode_kas = htmlspecialchars($data['kode_kas']);
+	$kode_akun = htmlspecialchars($data['kode_akun']);
+	$tgl_input = htmlspecialchars($data['tgl_input']);
+	$jumlah_pengeluaran = htmlspecialchars($data['jumlah_pengeluaran']);
+	$keterangan = htmlspecialchars($data['keterangan']);
+
+	// upload gambar
+	$bukti = upload_bukti();
+
+	// Tambah kas
+	$jenis = 'Berkurang';
+	$sisa_kas = $jumlah_pengeluaran;
+
+	// query insert KAS
+	$query_kas = "INSERT INTO kas Values 
+	('$kode_kas','$sisa_kas','$tgl_input','$keterangan','$jenis')";
+	mysqli_query($conn, $query_kas);
+
+	$query_pengeluaran = "INSERT INTO transaksi_pengeluaran Values 
+				('','$kode_akun', '$kode_kas','$tgl_input','$jumlah_pengeluaran','$keterangan','$bukti' )";
+
+
+	mysqli_query($conn, $query_pengeluaran);
+	return mysqli_affected_rows($conn);
+}
+
+function hapus_transaksi_pengeluaran($kode_kas)
+{
+	global $conn;
+	$query1 = "DELETE FROM transaksi_pengeluaran WHERE kode_kas= '$kode_kas'";
+	mysqli_query($conn, $query1);
+	$query2 = "DELETE FROM kas WHERE kode_kas= '$kode_kas'";
+	mysqli_query($conn, $query2);
+
+
+	return mysqli_affected_rows($conn);
+}
+
+function ubah_transaksi_pengeluaran($data)
+{
+	global $conn;
+	// ambil data dari tiap elemen dalam form 
+	$kode_kas = htmlspecialchars($data['kode_kas']);
+	$kode_akun = htmlspecialchars($data['kode_akun']);
+	$tgl_input = htmlspecialchars($data['tgl_input']);
+	$jumlah_pengeluaran = htmlspecialchars($data['jumlah_pengeluaran']);
+	$keterangan = htmlspecialchars($data['keterangan']);
+	$kode_pengeluaran = htmlspecialchars_decode($data['kode_pengeluaran']);
+	$gambar_lama = tampil_data("SELECT bukti_nota FROM transaksi_pengeluaran WHERE kode_pengeluaran = '$kode_pengeluaran'")[0];
+
+	// cek apakah user pilih gambar baru atau tidak 
+	if ($_FILES['bukti']['error'] === 4) {
+
+		$bukti = $gambar_lama['bukti_nota'];
+		// query ubah data 
+
+		$query_edit_kas = "UPDATE  kas SET
+			 sisa_kas = '$jumlah_pengeluaran',
+			 keterangan = '$keterangan' 
+			 WHERE kode_kas = '$kode_kas'
+			 ";
+		mysqli_query($conn, $query_edit_kas);
+
+		$query1 = "UPDATE  transaksi_pengeluaran SET
+			tgl_input = '$tgl_input',
+			jumlah_pengeluaran ='$jumlah_pengeluaran',
+			keterangan = '$keterangan'
+			WHERE kode_pengeluaran = '$kode_pengeluaran'
+			";
+		mysqli_query($conn, $query1);
+	} else {
+		$bukti = upload_bukti();
+
+		// query ubah data 
+		$query_edit_kas = "UPDATE  kas SET
+	sisa_kas = '$jumlah_pengeluaran',
+	keterangan = '$keterangan' 
+	WHERE kode_kas = '$kode_kas'
+	";
+		mysqli_query($conn, $query_edit_kas);
+
+		$query2 = "UPDATE  transaksi_pengeluaran SET 	 			
+	tgl_input = '$tgl_input',
+	jumlah_pengeluaran ='$jumlah_pengeluaran',
+	keterangan = '$keterangan',
+	bukti_nota = '$bukti'
+	WHERE kode_pengeluaran = '$kode_pengeluaran'
+	";
+		mysqli_query($conn, $query2);
+	}
+
+	return mysqli_affected_rows($conn);
+}
+
+
+function tambah_setoran($data)
+{
+	global $conn;
+	// ambil data dari tiap elemen dalam form 
+	$kode_kas = htmlspecialchars($data['kode_kas']);
+	$kode_akun = htmlspecialchars($data['kode_akun']);
+	$tgl_input = htmlspecialchars($data['tgl_input']);
+	$jumlah_setoran = htmlspecialchars($data['jumlah_setoran']);
+	$keterangan = htmlspecialchars($data['keterangan']);
+	$tgl_store = htmlspecialchars($data['tgl_store']);
+
+	// jika keterangan kosong 
+	if ($keterangan = ' ') {
+		$keterangan = "Setoran kos untuk tanggal " . tgl_indo($tgl_store);
+	}
+
+	// upload gambar
+	$bukti = upload_bukti();
+
+	// Tambah kas
+	$jenis = 'Berkurang';
+	$sisa_kas = $jumlah_setoran;
+
+	// query insert KAS
+	$query_kas = "INSERT INTO kas Values 
+	('$kode_kas','$sisa_kas','$tgl_input','$keterangan','$jenis')";
+	mysqli_query($conn, $query_kas);
+
+	$query_storean = "INSERT INTO setoran_owner Values 
+				('','$kode_akun', '$kode_kas','$tgl_store','$jumlah_setoran','$keterangan','$bukti' )";
+
+
+
+
+	mysqli_query($conn, $query_storean);
+	return mysqli_affected_rows($conn);
+}
+
+function ubah_setoran($data)
+{
+	global $conn;
+	// ambil data dari tiap elemen dalam form 
+	$kode_kas = htmlspecialchars($data['kode_kas']);
+	$kode_akun = htmlspecialchars($data['kode_akun']);
+	$tgl_store = htmlspecialchars($data['tgl_store']);
+	$jumlah_setoran = htmlspecialchars($data['jumlah_setoran']);
+	$keterangan = htmlspecialchars($data['keterangan']);
+	$kode_setoran = htmlspecialchars($data['kode_setoran']);
+	$gambar_lama = tampil_data("SELECT bukti_store FROM setoran_owner WHERE kode_setoran = '$kode_setoran'")[0];
+
+
+	// cek apakah user pilih gambar baru atau tidak 
+	if ($_FILES['bukti']['error'] === 4) {
+
+		$bukti = $gambar_lama['bukti_store'];
+		// query ubah data 
+		$query_edit_kas = "UPDATE  kas SET
+			 sisa_kas = '$jumlah_setoran',
+			 keterangan = '$keterangan' 
+			 WHERE kode_kas = '$kode_kas'
+			 ";
+		mysqli_query($conn, $query_edit_kas);
+
+		$query1 = "UPDATE setoran_owner SET
+			tgl_store = '$tgl_store',
+			jumlah_store ='$jumlah_setoran',
+			keterangan = '$keterangan'
+			WHERE kode_setoran = '$kode_setoran'
+			";
+		mysqli_query($conn, $query1);
+	} else {
+		$bukti = upload_bukti();
+
+		// query ubah data 
+		$query_edit_kas = "UPDATE  kas SET
+	sisa_kas = '$jumlah_setoran',
+	keterangan = '$keterangan' 
+	WHERE kode_kas = '$kode_kas'
+	";
+		mysqli_query($conn, $query_edit_kas);
+
+		$query2 = "UPDATE  setoran_owner SET 	 			
+	tgl_store = '$tgl_store',
+	jumlah_store ='$jumlah_setoran',
+	keterangan = '$keterangan',
+	bukti_store = '$bukti'
+	WHERE kode_setoran = '$kode_setoran'
+	";
+		mysqli_query($conn, $query2);
+	}
+
+
+
 	return mysqli_affected_rows($conn);
 }

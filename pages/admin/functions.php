@@ -517,7 +517,7 @@ function tambah_transaksi_pembayaran($data)
 	$jenis = 'Bertambah';
 	$sisa_kas = $jumlah_bayar;
 
-
+	// ambil bulan yang masih nunggak jika ada
 	$bulan_utang = $conn->query("SELECT
 			`transaksi_bulan_dibayar`.`bulan`,
 			`transaksi_bulan_dibayar`.`keterangan`
@@ -532,129 +532,26 @@ function tambah_transaksi_pembayaran($data)
 			ORDER BY kode_t_bulan DESC LIMIT 1");
 
 
-
-	if ($keterangan == "") {
-
-		// ambil bulan terkahir pembayaran
-
-		/**
-		 * $kode_t_kamar
-		 * $bulan_sekarang,
-		 * $jumlah_bayar,
-		 * $bulan_utang,
-		 * $harga_kamar
-		 */
-
-
-		$ketenrangann = generateKeterangan_Transaksi();
-
-		$query = $conn->query("SELECT
-				`transaksi_bulan_dibayar`.`bulan`
-				FROM
-				`transaksi_kos`
-				INNER JOIN `transaksi_pembayaran` ON `transaksi_kos`.`kode_t_kamar` =
-				`transaksi_pembayaran`.`kode_t_kamar`
-				INNER JOIN `transaksi_bulan_dibayar` ON `transaksi_pembayaran`.`kode_bayar` =
-				`transaksi_bulan_dibayar`.`kode_bayar`
-				WHERE `transaksi_pembayaran`.`kode_t_kamar` = $kode_t_kamar 
-				ORDER BY kode_t_bulan DESC LIMIT 1
-			");
-
-		if ($query->num_rows > 0) {
-			$result = $query;
-			$result = $result->fetch_assoc();
-			$bulan_terakhir = $result['bulan'];
-			// $bulan_terakhir = 
-		} else {
-			$bulan_terakhir = $bulan_sekarang;
-		}
-
-
-		$jumlah_pembayaran = $jumlah_bayar;
-		// cek ada bulan yang belum lunas
-		if ($bulan_utang->num_rows > 0) {
-			$result = $bulan_utang->fetch_assoc();
-			$utang = $result['keterangan'];
-			$array = explode(".", $utang);
-			$sisa_utang = substr($array[1], 0, 3) . '000';
-			$jumlah_pembayaran = $jumlah_bayar - $sisa_utang;
-			$bulan_selanjutnya = $bulan_terakhir + 1;
-
-			// cek setelah bayar utang bulan apakah uang masih ada
-			$keterangann = $jumlah_pembayaran < $harga_kamar ?
-				"Pembayaran Atas Nama $nama_pelanggan Untuk Kamar $kode_kamar pada bulan" . bulan_indo($bulan_terakhir) . " dan bulan " . bulan_indo($bulan_selanjutnya) . " masih kurang Rp." . number_format($harga_kamar - $jumlah_pembayaran) . ",-"
-				:
-				"Pembayaran Atas Nama $nama_pelanggan Untuk Kamar $kode_kamar pada bulan " . bulan_indo($bulan_terakhir) . " dan bulan " . bulan_indo($bulan_selanjutnya) . " lunas";
-
-			if ($jumlah_pembayaran > $harga_kamar) {
-				$bulan_pembayaran = ($jumlah_pembayaran / $harga_kamar) + 1;
-				goto a; # lompat langsung ke koding yang ada label a.
-			}
-
-			goto  b;
-		}
-
-		// keterangan untuk pembayaran satu bulan
-		if ($jumlah_pembayaran == $harga_kamar) {
-			$bulan_terakhir = $query->num_rows > 0 ? $bulan_terakhir + 1 : $bulan_terakhir;
-			$keterangann = "Pembayaran Atas Nama $nama_pelanggan Untuk Kamar $kode_kamar Pada Bulan " . bulan_indo($bulan_terakhir) . " Di Bayar Lunas";
-		}
-
-
-		b:
-		// keterangan untuk pembayaran lebih dari satu bulan
-		if ($jumlah_pembayaran > $harga_kamar) {
-
-			$bulan_terakhir = $query->num_rows > 0 ? $bulan_terakhir + 1 : $bulan_terakhir;
-			// jumlah bayar pas atau tidak
-			$bulan_pembayaran = $jumlah_pembayaran / $harga_kamar;
-
-			a:
-
-			$selisih = ($jumlah_pembayaran % $harga_kamar) - $harga_kamar;
-
-			$selisih = substr($selisih, 1, 10);
-			$selisih = "Rp." . number_format($selisih) . ",-";
-
-
-
-			$keterangann = is_int($bulan_pembayaran) ?
-				"Pembayaran Atas Nama $nama_pelanggan Untuk Kamar $kode_kamar Di Bayar Lunas untuk bulan " . bulan_indo($bulan_terakhir) . " sampai bulan " . bulan_indo(($bulan_pembayaran + $bulan_terakhir) - 1)
-				:
-				"Pembayaran Atas Nama $nama_pelanggan Untuk Kamar $kode_kamar pada bulan " . bulan_indo($bulan_terakhir) . " sampai bulan " . bulan_indo(ceil(($bulan_pembayaran + $bulan_terakhir) - 1)) . " masih kurang $selisih";
-		}
-	}
+	// jika keterangannya kosong maka, keterangan akan diset generate secara otomatis
+	$keterangann = $keterangan == "" ? generateKeterangan_Transaksi($kode_t_kamar, $bulan_sekarang, $jumlah_bayar, $bulan_utang, $harga_kamar, $nama_pelanggan, $kode_kamar) : $keterangan;
 
 
 	// QUERY INSERT KAS
 	$query_kas = "INSERT INTO kas Values 
 	('$kode_kas','$sisa_kas','$tgl_input','$keterangann','$jenis')";
 	mysqli_query($conn, $query_kas);
+
 	// QUERY INSERT TRANSAKSI PEMBAYARAN
 	$query1 = "INSERT INTO transaksi_pembayaran Values 
-	('$kode_bayar','$kode_t_kamar','$kode_kas','$kode_akun','$tgl_bayar','$metode_bayar','$bukti','$jumlah_bayar','$keterangann')";
+	('$kode_bayar',$kode_t_kamar,'$kode_kas','$tgl_bayar','$metode_bayar','$bukti','$jumlah_bayar','$keterangann')";
 	mysqli_query($conn, $query1);
-
-	// ambil bulan yang belum lunas
-	$bulan_belum_lunas = $conn->query("SELECT
-			`transaksi_bulan_dibayar`.`bulan`,
-			`transaksi_bulan_dibayar`.`keterangan`
-			FROM
-			`transaksi_kos`
-			INNER JOIN `transaksi_pembayaran` ON `transaksi_kos`.`kode_t_kamar` =
-			`transaksi_pembayaran`.`kode_t_kamar`
-			INNER JOIN `transaksi_bulan_dibayar` ON `transaksi_pembayaran`.`kode_bayar` =
-			`transaksi_bulan_dibayar`.`kode_bayar`
-			WHERE `transaksi_pembayaran`.`kode_t_kamar` = $kode_t_kamar 
-			and `transaksi_bulan_dibayar`.`status` = 'belum lunas'
-			ORDER BY kode_t_bulan DESC LIMIT 1");
 
 
 	// cek bulan yang belum lunas
-	if ($bulan_belum_lunas->num_rows > 0) {
+	if ($bulan_utang->num_rows > 0) {
 		// Check apa ada bulan yang belum lunas
 		// bayar hutang
-		$bulan = $bulan_belum_lunas->fetch_assoc();
+		$bulan = $bulan_utang->fetch_assoc();
 		$bulan = $bulan['bulan'];
 		$selisih = tampil_data("SELECT * FROM transaksi_bulan_dibayar WHERE status = 'belum lunas' ")[0];
 		$sel = $selisih['keterangan'];
@@ -760,6 +657,90 @@ function tambah_transaksi_pembayaran($data)
 
 	return mysqli_affected_rows($conn);
 }
+
+function generateKeterangan_Transaksi($kode_t_kamar, $bulan_sekarang, $jumlah_bayar, $bulan_utang, $harga_kamar, $nama_pelanggan, $kode_kamar): string
+{
+	global $conn;
+
+	$query = $conn->query("SELECT
+				`transaksi_bulan_dibayar`.`bulan`
+				FROM
+				`transaksi_kos`
+				INNER JOIN `transaksi_pembayaran` ON `transaksi_kos`.`kode_t_kamar` =
+				`transaksi_pembayaran`.`kode_t_kamar`
+				INNER JOIN `transaksi_bulan_dibayar` ON `transaksi_pembayaran`.`kode_bayar` =
+				`transaksi_bulan_dibayar`.`kode_bayar`
+				WHERE `transaksi_pembayaran`.`kode_t_kamar` = $kode_t_kamar 
+				ORDER BY kode_t_bulan DESC LIMIT 1
+			");
+
+	if ($query->num_rows > 0) {
+		$result = $query;
+		$result = $result->fetch_assoc();
+		$bulan_terakhir = $result['bulan'];
+		// $bulan_terakhir = 
+	} else {
+		$bulan_terakhir = $bulan_sekarang;
+	}
+
+
+	$jumlah_pembayaran = $jumlah_bayar;
+	// cek ada bulan yang belum lunas
+	if ($bulan_utang->num_rows > 0) {
+		$result = $bulan_utang->fetch_assoc();
+		$utang = $result['keterangan'];
+		$array = explode(".", $utang);
+		$sisa_utang = substr($array[1], 0, 3) . '000';
+		$jumlah_pembayaran = $jumlah_bayar - $sisa_utang;
+		$bulan_selanjutnya = $bulan_terakhir + 1;
+
+		// cek setelah bayar utang bulan apakah uang masih ada
+		$keterangann = $jumlah_pembayaran < $harga_kamar ?
+			"Pembayaran Atas Nama $nama_pelanggan Untuk Kamar $kode_kamar pada bulan" . bulan_indo($bulan_terakhir) . " dan bulan " . bulan_indo($bulan_selanjutnya) . " masih kurang Rp." . number_format($harga_kamar - $jumlah_pembayaran) . ",-"
+			:
+			"Pembayaran Atas Nama $nama_pelanggan Untuk Kamar $kode_kamar pada bulan " . bulan_indo($bulan_terakhir) . " dan bulan " . bulan_indo($bulan_selanjutnya) . " lunas";
+
+		if ($jumlah_pembayaran > $harga_kamar) {
+			$bulan_pembayaran = ($jumlah_pembayaran / $harga_kamar) + 1;
+			goto a; # lompat langsung ke koding yang ada label a.
+		}
+
+		goto  b;
+	}
+
+	// keterangan untuk pembayaran satu bulan
+	if ($jumlah_pembayaran == $harga_kamar) {
+		$bulan_terakhir = $query->num_rows > 0 ? $bulan_terakhir + 1 : $bulan_terakhir;
+		$keterangann = "Pembayaran Atas Nama $nama_pelanggan Untuk Kamar $kode_kamar Pada Bulan " . bulan_indo($bulan_terakhir) . " Di Bayar Lunas";
+	}
+
+
+	b:
+	// keterangan untuk pembayaran lebih dari satu bulan
+	if ($jumlah_pembayaran > $harga_kamar) {
+
+		$bulan_terakhir = $query->num_rows > 0 ? $bulan_terakhir + 1 : $bulan_terakhir;
+		// jumlah bayar pas atau tidak
+		$bulan_pembayaran = $jumlah_pembayaran / $harga_kamar;
+
+		a:
+
+		$selisih = ($jumlah_pembayaran % $harga_kamar) - $harga_kamar;
+
+		$selisih = substr($selisih, 1, 10);
+		$selisih = "Rp." . number_format($selisih) . ",-";
+
+
+
+		$keterangann = is_int($bulan_pembayaran) ?
+			"Pembayaran Atas Nama $nama_pelanggan Untuk Kamar $kode_kamar Di Bayar Lunas untuk bulan " . bulan_indo($bulan_terakhir) . " sampai bulan " . bulan_indo(($bulan_pembayaran + $bulan_terakhir) - 1)
+			:
+			"Pembayaran Atas Nama $nama_pelanggan Untuk Kamar $kode_kamar pada bulan " . bulan_indo($bulan_terakhir) . " sampai bulan " . bulan_indo(ceil(($bulan_pembayaran + $bulan_terakhir) - 1)) . " masih kurang $selisih";
+	}
+
+	return $keterangann;
+}
+
 function upload_bukti()
 {
 

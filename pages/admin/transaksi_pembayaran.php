@@ -1,11 +1,11 @@
 <?php
-session_start(); 
+session_start();
 require 'functions.php';
-if (!isset($_SESSION["level"])=="superadmin") {
-	header("Location: ../login.php");
+if (!isset($_SESSION["level"]) == "superadmin") {
+  header("Location: ../login.php");
   exit;
-  }
-$transaksi_bayar = tampil_data("SELECT * FROM transaksi_pembayaran JOIN akun ON akun.kode_akun = transaksi_pembayaran.kode_akun JOIN transaksi_kos ON transaksi_kos.kode_t_kamar = transaksi_pembayaran.kode_t_kamar JOIN kamar_kos ON kamar_kos.kode_kamar = transaksi_kos.kode_kamar JOIN kategori_kos ON kategori_kos.kode_kategori = kamar_kos.kode_kategori ORDER BY tgl_bayar ");
+}
+$transaksi_bayar = tampil_data("SELECT * FROM transaksi_pembayaran ");
 
 
 
@@ -35,7 +35,7 @@ if (isset($_POST["submit"])) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Aplikasi Rumah Sewaku</title>
+  <title>Aplikasi Rumah Sewaku</title>
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -61,7 +61,7 @@ if (isset($_POST["submit"])) {
   $kodeBayar = $huruf . sprintf("%03s", $urutan);
   ?>
 
-<?php
+  <?php
   // kode kas
   $id = id("SELECT max(kode_kas) as kodeTerbesar FROM kas");
   $kodeKas = $id['kodeTerbesar'];
@@ -138,7 +138,7 @@ if (isset($_POST["submit"])) {
                                 <input type="hidden" name="bulan" value=" <?php echo date('m'); ?>">
                                 <input type="hidden" name="tahun" value=" <?php echo date('Y'); ?>">
                                 <input type="hidden" name="kode_kas" value="<?= $kodeKas; ?>">
-                                <input type="hidden" name="tgl_input" value="<?=  date('Y-m-d')  ?>">
+                                <input type="hidden" name="tgl_input" value="<?= date('Y-m-d')  ?>">
                                 <input type="hidden" name="kode_kamar" id="kode_kamar">
                                 <label for="sumber">Penginput</label>
                                 <select name="nama" id="kode_akun" class="form-control" disabled>

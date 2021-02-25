@@ -1,10 +1,5 @@
-<?php
-session_start(); 
+<?php 
 require 'functions.php';
-if (!isset($_SESSION["level"])=="superadmin") {
-	header("Location: ../login.php");
-  exit;
-  }
 $daftar_kos=tampil_data ("SELECT * FROM transaksi_kos RIGHT JOIN kamar_kos ON transaksi_kos.kode_kamar = kamar_kos.kode_kamar LEFT JOIN pelanggan ON transaksi_kos.kode_pelanggan = pelanggan.kode_pelanggan LEFT JOIN akun ON pelanggan.kode_akun = akun.kode_akun JOIN kategori_kos ON kategori_kos.kode_kategori = kamar_kos.kode_kategori");
  
 // cek apakah tombol submit sudah ditekan atau belum
@@ -32,7 +27,7 @@ if (isset($_POST["submit"])) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Aplikasi Rumah Sewaku</title>
+  <title>AdminLTE 3 | DataTables</title>
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">

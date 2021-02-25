@@ -1,11 +1,8 @@
 <?php
-session_start(); 
+session_start();
 require 'functions.php';
-if (!isset($_SESSION["level"])=="superadmin") {
-	header("Location: ../login.php");
-  exit;
-  }
-$transaksi_bayar = tampil_data("SELECT * FROM transaksi_pembayaran JOIN akun ON akun.kode_akun = transaksi_pembayaran.kode_akun JOIN transaksi_kos ON transaksi_kos.kode_t_kamar = transaksi_pembayaran.kode_t_kamar JOIN kamar_kos ON kamar_kos.kode_kamar = transaksi_kos.kode_kamar JOIN kategori_kos ON kategori_kos.kode_kategori = kamar_kos.kode_kategori ORDER BY tgl_bayar ");
+
+$transaksi_bayar = tampil_data("SELECT * FROM transaksi_pembayaran INNER JOIN transaksi_kos ON transaksi_pembayaran.kode_t_kamar = transaksi_kos.kode_t_kamar INNER JOIN kamar_kos ON transaksi_pembayaran.kode_kamar = kamar_kos.kode_kamar INNER JOIN kategori_kos ON kamar_kos.kode_kategori = kategori_kos.kode_kategori");
 
 
 
@@ -35,7 +32,7 @@ if (isset($_POST["submit"])) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Aplikasi Rumah Sewaku</title>
+  <title>AdminLTE 3 | DataTables</title>
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -109,6 +106,7 @@ if (isset($_POST["submit"])) {
           <div class="row">
             <div class="col-12">
               <div class="card">
+
               </div>
               <!-- /.card -->
               <div class="card">
@@ -130,6 +128,7 @@ if (isset($_POST["submit"])) {
                               <span aria-hidden="true">&times;</span>
                             </button>
                           </div>
+
                           <!-- form start -->
                           <form action="" method="post" enctype="multipart/form-data">
                             <div class="card-body">
@@ -138,18 +137,21 @@ if (isset($_POST["submit"])) {
                                 <input type="hidden" name="bulan" value=" <?php echo date('m'); ?>">
                                 <input type="hidden" name="tahun" value=" <?php echo date('Y'); ?>">
                                 <input type="hidden" name="kode_kas" value="<?= $kodeKas; ?>">
-                                <input type="hidden" name="tgl_input" value="<?=  date('Y-m-d')  ?>">
+                                <input type="hidden" name="tgl_input" value="<?= tgl_indo(date('Y-m-d')) ?>">
                                 <input type="hidden" name="kode_kamar" id="kode_kamar">
                                 <label for="sumber">Penginput</label>
-                                <select name="nama" id="kode_akun" class="form-control" disabled>
+                                <select id="kode_akun" class="form-control" disabled>
                                   <?php
                                   $nama = $_SESSION['nama'];
                                   $akun = tampil_data("SELECT akun.kode_akun FROM akun WHERE nama = '$nama'")[0];
                                   ?>
-                                  <option value=""><?= $nama; ?> </option>
+                                  <option value="<?= $nama; ?>"><?= $nama; ?> </option>
                                 </select>
                                 <input type="hidden" name="kode_akun" value="<?= $akun['kode_akun'] ?>">
                               </div>
+
+                              <!-- penginput -->
+                              <input type="hidden" name="penghuni" value="<?= $nama; ?>">
 
                               <div class="form-group">
                                 <label for="sumber">Kategori Kos</label>
@@ -238,7 +240,11 @@ if (isset($_POST["submit"])) {
                               <button type="submit" name="submit" class="btn btn-primary">Simpan</button>
                             </div>
                           </form>
+
                         </div>
+
+
+
                       </div>
                       <!-- /.modal-dialog -->
                     </div>
@@ -266,18 +272,19 @@ if (isset($_POST["submit"])) {
                         <?php foreach ($transaksi_bayar as $data) : ?>
                           <tr>
                             <td><?= $i; ?></td>
-                            <td> <?= $data['nama']; ?></td>
+                            <td> <?= $data['penginput']; ?></td>
                             <td> <?= $data['kategori_kos']; ?></td>
                             <td> <?= $data['kode_kamar']; ?></td>
                             <td> <?= tgl_indo($data["tgl_bayar"]); ?></td>
                             <td> <?= $data['metode_bayar']; ?></td>
+
                             <td> <a class="btn btn-primary " href="#" data-placement="top" title="Bukti Pembayaran" data-toggle="modal" data-target="#modal-lg_bukti<?php echo $data['kode_bayar']; ?>"> <i class="fa fa-info-circle" aria-hidden="true"></i></a>
                               <!-- modal keterangan -->
                               <div class="modal fade" id="modal-lg_bukti<?php echo $data['kode_bayar']; ?>">
                                 <div class="modal-dialog modal-lg">
                                   <div class="modal-content">
                                     <div class="modal-header">
-                                      <h4 class="modal-title">Bukti Pembayaran</h4>
+                                      <h4 class="modal-title"> </h4>
                                       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                       </button>
@@ -313,6 +320,7 @@ if (isset($_POST["submit"])) {
                           <?php $i++ ?>
                         <?php endforeach; ?>
                       </tbody>
+
                     </table>
                   </div>
                   <!-- /.card-body -->

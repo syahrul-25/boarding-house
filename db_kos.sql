@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 18 Feb 2021 pada 17.01
--- Versi server: 10.4.11-MariaDB
--- Versi PHP: 7.2.31
+-- Generation Time: Feb 21, 2021 at 11:04 AM
+-- Server version: 10.4.11-MariaDB
+-- PHP Version: 7.4.5
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,7 +24,7 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `akun`
+-- Table structure for table `akun`
 --
 
 CREATE TABLE `akun` (
@@ -37,7 +37,7 @@ CREATE TABLE `akun` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Dumping data untuk tabel `akun`
+-- Dumping data for table `akun`
 --
 
 INSERT INTO `akun` (`kode_akun`, `nama`, `email`, `password`, `level`, `status`) VALUES
@@ -49,7 +49,7 @@ INSERT INTO `akun` (`kode_akun`, `nama`, `email`, `password`, `level`, `status`)
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `kamar_kos`
+-- Table structure for table `kamar_kos`
 --
 
 CREATE TABLE `kamar_kos` (
@@ -59,7 +59,7 @@ CREATE TABLE `kamar_kos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Dumping data untuk tabel `kamar_kos`
+-- Dumping data for table `kamar_kos`
 --
 
 INSERT INTO `kamar_kos` (`kode_kamar`, `kode_kategori`, `harga`) VALUES
@@ -69,7 +69,7 @@ INSERT INTO `kamar_kos` (`kode_kamar`, `kode_kategori`, `harga`) VALUES
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `kas`
+-- Table structure for table `kas`
 --
 
 CREATE TABLE `kas` (
@@ -81,18 +81,17 @@ CREATE TABLE `kas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Dumping data untuk tabel `kas`
+-- Dumping data for table `kas`
 --
 
 INSERT INTO `kas` (`kode_kas`, `sisa_kas`, `tgl_input`, `keterangan`, `jenis`) VALUES
 ('kas001', 1000000, '2021-02-17', 'Pembayaran Atas Nama Rudi Untuk Kamar 1B Pada Bulan Februari Di Bayar Lunas', 'Bertambah'),
-('kas002', 1000000, '2021-02-17', 'Pembayaran Atas Nama fatur Untuk Kamar 1B Pada Bulan Februari Di Bayar Lunas', 'Bertambah'),
 ('kas003', 1000000, '2021-02-17', 'Pembayaran Atas Nama Oktavian Indriani Untuk Kamar 20C pada bulan Februari sampai bulan Maret masih kurang Rp.600,000,-', 'Bertambah');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `kategori_kos`
+-- Table structure for table `kategori_kos`
 --
 
 CREATE TABLE `kategori_kos` (
@@ -101,7 +100,7 @@ CREATE TABLE `kategori_kos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Dumping data untuk tabel `kategori_kos`
+-- Dumping data for table `kategori_kos`
 --
 
 INSERT INTO `kategori_kos` (`kode_kategori`, `kategori_kos`) VALUES
@@ -112,7 +111,7 @@ INSERT INTO `kategori_kos` (`kode_kategori`, `kategori_kos`) VALUES
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `pelanggan`
+-- Table structure for table `pelanggan`
 --
 
 CREATE TABLE `pelanggan` (
@@ -127,7 +126,7 @@ CREATE TABLE `pelanggan` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Dumping data untuk tabel `pelanggan`
+-- Dumping data for table `pelanggan`
 --
 
 INSERT INTO `pelanggan` (`kode_pelanggan`, `kode_akun`, `jk`, `no_hp`, `foto_diri`, `ktp`, `tgl_daftar`, `statuss`) VALUES
@@ -138,7 +137,7 @@ INSERT INTO `pelanggan` (`kode_pelanggan`, `kode_akun`, `jk`, `no_hp`, `foto_dir
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `setoran_owner`
+-- Table structure for table `setoran_owner`
 --
 
 CREATE TABLE `setoran_owner` (
@@ -154,7 +153,7 @@ CREATE TABLE `setoran_owner` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `transaksi_bulan_dibayar`
+-- Table structure for table `transaksi_bulan_dibayar`
 --
 
 CREATE TABLE `transaksi_bulan_dibayar` (
@@ -167,20 +166,10 @@ CREATE TABLE `transaksi_bulan_dibayar` (
   `keterangan` longtext NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Dumping data untuk tabel `transaksi_bulan_dibayar`
---
-
-INSERT INTO `transaksi_bulan_dibayar` (`kode_t_bulan`, `kode_bayar`, `tahun`, `bulan`, `jumlah`, `status`, `keterangan`) VALUES
-(174, 'B001', 2021, 2, 1000000, 'lunas', ''),
-(175, 'B002', 2021, 2, 1000000, 'lunas', ''),
-(176, 'B003', 2021, 2, 800000, 'lunas', ''),
-(177, 'B003', 2021, 3, 200000, 'belum lunas', 'Uang Kurang Rp.600,000,-');
-
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `transaksi_kos`
+-- Table structure for table `transaksi_kos`
 --
 
 CREATE TABLE `transaksi_kos` (
@@ -190,7 +179,7 @@ CREATE TABLE `transaksi_kos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Dumping data untuk tabel `transaksi_kos`
+-- Dumping data for table `transaksi_kos`
 --
 
 INSERT INTO `transaksi_kos` (`kode_t_kamar`, `kode_kamar`, `kode_pelanggan`) VALUES
@@ -199,34 +188,27 @@ INSERT INTO `transaksi_kos` (`kode_t_kamar`, `kode_kamar`, `kode_pelanggan`) VAL
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `transaksi_pembayaran`
+-- Table structure for table `transaksi_pembayaran`
 --
 
 CREATE TABLE `transaksi_pembayaran` (
   `kode_bayar` char(11) NOT NULL,
   `kode_t_kamar` int(11) NOT NULL,
   `kode_kas` char(11) NOT NULL,
-  `kode_akun` char(100) NOT NULL,
   `tgl_bayar` date NOT NULL,
+  `penghuni` varchar(100) NOT NULL DEFAULT '',
+  `penginput` varchar(100) NOT NULL DEFAULT '',
+  `kode_kamar` varchar(100) NOT NULL DEFAULT '',
   `metode_bayar` text NOT NULL,
   `bukti_bayar` longblob NOT NULL,
   `jumlah_bayar` int(11) NOT NULL,
   `keterangan` longtext NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Dumping data untuk tabel `transaksi_pembayaran`
---
-
-INSERT INTO `transaksi_pembayaran` (`kode_bayar`, `kode_t_kamar`, `kode_kas`, `kode_akun`, `tgl_bayar`, `metode_bayar`, `bukti_bayar`, `jumlah_bayar`, `keterangan`) VALUES
-('B001', 26, 'kas001', 'kd001', '2021-02-17', 'cash', '', 1000000, 'Pembayaran Atas Nama Rudi Untuk Kamar 1B Pada Bulan Februari Di Bayar Lunas'),
-('B002', 27, 'kas002', 'kd001', '2021-02-18', 'cash', '', 1000000, 'Pembayaran Atas Nama fatur Untuk Kamar 1B Pada Bulan Februari Di Bayar Lunas'),
-('B003', 25, 'kas003', 'kd001', '2021-02-18', 'cash', '', 1000000, 'Pembayaran Atas Nama Oktavian Indriani Untuk Kamar 20C pada bulan Februari sampai bulan Maret masih kurang Rp.600,000,-');
-
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `transaksi_pengeluaran`
+-- Table structure for table `transaksi_pengeluaran`
 --
 
 CREATE TABLE `transaksi_pengeluaran` (
@@ -244,33 +226,33 @@ CREATE TABLE `transaksi_pengeluaran` (
 --
 
 --
--- Indeks untuk tabel `akun`
+-- Indexes for table `akun`
 --
 ALTER TABLE `akun`
   ADD PRIMARY KEY (`kode_akun`);
 
 --
--- Indeks untuk tabel `kamar_kos`
+-- Indexes for table `kamar_kos`
 --
 ALTER TABLE `kamar_kos`
   ADD PRIMARY KEY (`kode_kamar`),
   ADD KEY `kode_kategori` (`kode_kategori`);
 
 --
--- Indeks untuk tabel `kas`
+-- Indexes for table `kas`
 --
 ALTER TABLE `kas`
   ADD PRIMARY KEY (`kode_kas`);
 
 --
--- Indeks untuk tabel `kategori_kos`
+-- Indexes for table `kategori_kos`
 --
 ALTER TABLE `kategori_kos`
   ADD PRIMARY KEY (`kode_kategori`),
   ADD UNIQUE KEY `kategori_kos` (`kategori_kos`);
 
 --
--- Indeks untuk tabel `pelanggan`
+-- Indexes for table `pelanggan`
 --
 ALTER TABLE `pelanggan`
   ADD PRIMARY KEY (`kode_pelanggan`),
@@ -278,7 +260,7 @@ ALTER TABLE `pelanggan`
   ADD KEY `kode_akun` (`kode_akun`);
 
 --
--- Indeks untuk tabel `setoran_owner`
+-- Indexes for table `setoran_owner`
 --
 ALTER TABLE `setoran_owner`
   ADD PRIMARY KEY (`kode_setoran`),
@@ -286,14 +268,14 @@ ALTER TABLE `setoran_owner`
   ADD KEY `kode_kas` (`kode_kas`);
 
 --
--- Indeks untuk tabel `transaksi_bulan_dibayar`
+-- Indexes for table `transaksi_bulan_dibayar`
 --
 ALTER TABLE `transaksi_bulan_dibayar`
   ADD PRIMARY KEY (`kode_t_bulan`),
   ADD KEY `kode_bayar` (`kode_bayar`);
 
 --
--- Indeks untuk tabel `transaksi_kos`
+-- Indexes for table `transaksi_kos`
 --
 ALTER TABLE `transaksi_kos`
   ADD PRIMARY KEY (`kode_t_kamar`),
@@ -302,16 +284,15 @@ ALTER TABLE `transaksi_kos`
   ADD KEY `kode_pelangaan` (`kode_pelanggan`);
 
 --
--- Indeks untuk tabel `transaksi_pembayaran`
+-- Indexes for table `transaksi_pembayaran`
 --
 ALTER TABLE `transaksi_pembayaran`
   ADD PRIMARY KEY (`kode_bayar`),
-  ADD KEY `kode_t_kamar` (`kode_t_kamar`,`kode_akun`),
-  ADD KEY `kode_akun` (`kode_akun`),
-  ADD KEY `kode_kas` (`kode_kas`);
+  ADD KEY `kode_kas` (`kode_kas`),
+  ADD KEY `kode_t_kamar` (`kode_t_kamar`);
 
 --
--- Indeks untuk tabel `transaksi_pengeluaran`
+-- Indexes for table `transaksi_pengeluaran`
 --
 ALTER TABLE `transaksi_pengeluaran`
   ADD PRIMARY KEY (`kode_pengeluaran`),
@@ -319,83 +300,83 @@ ALTER TABLE `transaksi_pengeluaran`
   ADD KEY `kode_kas` (`kode_kas`);
 
 --
--- AUTO_INCREMENT untuk tabel yang dibuang
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT untuk tabel `kategori_kos`
+-- AUTO_INCREMENT for table `kategori_kos`
 --
 ALTER TABLE `kategori_kos`
   MODIFY `kode_kategori` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- AUTO_INCREMENT untuk tabel `setoran_owner`
+-- AUTO_INCREMENT for table `setoran_owner`
 --
 ALTER TABLE `setoran_owner`
   MODIFY `kode_setoran` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT untuk tabel `transaksi_bulan_dibayar`
+-- AUTO_INCREMENT for table `transaksi_bulan_dibayar`
 --
 ALTER TABLE `transaksi_bulan_dibayar`
   MODIFY `kode_t_bulan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=178;
 
 --
--- AUTO_INCREMENT untuk tabel `transaksi_kos`
+-- AUTO_INCREMENT for table `transaksi_kos`
 --
 ALTER TABLE `transaksi_kos`
   MODIFY `kode_t_kamar` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
--- AUTO_INCREMENT untuk tabel `transaksi_pengeluaran`
+-- AUTO_INCREMENT for table `transaksi_pengeluaran`
 --
 ALTER TABLE `transaksi_pengeluaran`
   MODIFY `kode_pengeluaran` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
--- Ketidakleluasaan untuk tabel pelimpahan (Dumped Tables)
+-- Constraints for dumped tables
 --
 
 --
--- Ketidakleluasaan untuk tabel `kamar_kos`
+-- Constraints for table `kamar_kos`
 --
 ALTER TABLE `kamar_kos`
   ADD CONSTRAINT `kamar_kos_ibfk_1` FOREIGN KEY (`kode_kategori`) REFERENCES `kategori_kos` (`kode_kategori`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Ketidakleluasaan untuk tabel `pelanggan`
+-- Constraints for table `pelanggan`
 --
 ALTER TABLE `pelanggan`
   ADD CONSTRAINT `pelanggan_ibfk_1` FOREIGN KEY (`kode_akun`) REFERENCES `akun` (`kode_akun`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Ketidakleluasaan untuk tabel `setoran_owner`
+-- Constraints for table `setoran_owner`
 --
 ALTER TABLE `setoran_owner`
   ADD CONSTRAINT `setoran_owner_ibfk_1` FOREIGN KEY (`kode_kas`) REFERENCES `kas` (`kode_kas`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `setoran_owner_ibfk_2` FOREIGN KEY (`kode_akun`) REFERENCES `akun` (`kode_akun`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Ketidakleluasaan untuk tabel `transaksi_bulan_dibayar`
+-- Constraints for table `transaksi_bulan_dibayar`
 --
 ALTER TABLE `transaksi_bulan_dibayar`
   ADD CONSTRAINT `transaksi_bulan_dibayar_ibfk_1` FOREIGN KEY (`kode_bayar`) REFERENCES `transaksi_pembayaran` (`kode_bayar`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Ketidakleluasaan untuk tabel `transaksi_kos`
+-- Constraints for table `transaksi_kos`
 --
 ALTER TABLE `transaksi_kos`
   ADD CONSTRAINT `transaksi_kos_ibfk_1` FOREIGN KEY (`kode_pelanggan`) REFERENCES `pelanggan` (`kode_pelanggan`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `transaksi_kos_ibfk_2` FOREIGN KEY (`kode_kamar`) REFERENCES `kamar_kos` (`kode_kamar`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Ketidakleluasaan untuk tabel `transaksi_pembayaran`
+-- Constraints for table `transaksi_pembayaran`
 --
 ALTER TABLE `transaksi_pembayaran`
   ADD CONSTRAINT `transaksi_pembayaran_ibfk_1` FOREIGN KEY (`kode_kas`) REFERENCES `kas` (`kode_kas`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Ketidakleluasaan untuk tabel `transaksi_pengeluaran`
+-- Constraints for table `transaksi_pengeluaran`
 --
 ALTER TABLE `transaksi_pengeluaran`
   ADD CONSTRAINT `transaksi_pengeluaran_ibfk_1` FOREIGN KEY (`kode_akun`) REFERENCES `akun` (`kode_akun`) ON DELETE CASCADE ON UPDATE CASCADE,

@@ -1,9 +1,9 @@
 <?php
-session_start(); 
-if (!isset($_SESSION["level"])=="superadmin") {
-	header("Location: ../login.php");
+session_start();
+if (!isset($_SESSION["level"]) == "superadmin") {
+  header("Location: ../login.php");
   exit;
-  }
+}
 require 'functions.php';
 $tahun = date('Y');
 // ambil data di URL 
@@ -29,27 +29,31 @@ $transaksi_bulan = tampil_data("SELECT
                                 INNER JOIN `akun` ON `pelanggan`.`kode_akun` = `akun`.`kode_akun`
                                 WHERE `transaksi_kos`.`kode_t_kamar` = $kode_t_kamar");
 
-$result = $conn->query("SELECT
-                                `transaksi_bulan_dibayar`.`kode_t_bulan`
-                              FROM
-                                `transaksi_kos`
-                                INNER JOIN `transaksi_pembayaran` ON `transaksi_kos`.`kode_t_kamar` =
-                              `transaksi_pembayaran`.`kode_t_kamar`
-                                INNER JOIN `transaksi_bulan_dibayar` ON `transaksi_pembayaran`.`kode_bayar` =
-                              `transaksi_bulan_dibayar`.`kode_bayar`
-                              WHERE `transaksi_bulan_dibayar`.`bulan` IN(
-                              SELECT `transaksi_bulan_dibayar`.`bulan`
-                              FROM `transaksi_bulan_dibayar`
-                              GROUP BY `transaksi_bulan_dibayar`.`bulan`
-                              having count(bulan) > 1 and status='belum lunas' and `transaksi_bulan_dibayar` . `tahun` = $tahun and `transaksi_kos`.`kode_t_kamar` = $kode_t_kamar
-                              )");
-
- 
-
 $bulan_belum_lunas = [];
-while ($row = $result->fetch_assoc()) {
-  $bulan_belum_lunas[] = $row['kode_t_bulan'];
+# cari utang yang nunggak di tahun sekarang sampai 5 tahun kedepan
+for ($i = $tahun; $i <= $tahun + 5; $i++) {
+  # cari bulan nunggak pertahun
+  $result = $conn->query("SELECT
+                          `transaksi_bulan_dibayar`.`kode_t_bulan`
+                        FROM
+                          `transaksi_kos`
+                          INNER JOIN `transaksi_pembayaran` ON `transaksi_kos`.`kode_t_kamar` =
+                        `transaksi_pembayaran`.`kode_t_kamar`
+                          INNER JOIN `transaksi_bulan_dibayar` ON `transaksi_pembayaran`.`kode_bayar` =
+                        `transaksi_bulan_dibayar`.`kode_bayar`
+                        WHERE `transaksi_bulan_dibayar`.`bulan` IN(
+                        SELECT `transaksi_bulan_dibayar`.`bulan`
+                        FROM `transaksi_bulan_dibayar`
+                        GROUP BY `transaksi_bulan_dibayar`.`bulan`
+                        having count(bulan) > 1 and status='belum lunas' and `transaksi_bulan_dibayar` . `tahun` = $i and `transaksi_kos`.`kode_t_kamar` = $kode_t_kamar
+                        )");
+
+  # simpan data bulan yang belum lunas
+  while ($row = $result->fetch_assoc()) {
+    $bulan_belum_lunas[] = $row['kode_t_bulan'];
+  }
 }
+
 
 
 // cek apakah tombol submit sudah ditekan atau belum
@@ -165,14 +169,14 @@ if (isset($_POST["submit"])) {
                             <td><?= $data['kode_kamar']; ?></td>
                             <td> <?= $data['tahun']; ?></td>
                             <td> <?= bulan_indo(date($data['bulan'])); ?></td>
-                            <td><?= "Rp.".number_format($data['jumlah']).",-"; ?></td>
-                            <?php if ($data['status']=='belum lunas' ) : ?>
+                            <td><?= "Rp." . number_format($data['jumlah']) . ",-"; ?></td>
+                            <?php if ($data['status'] == 'belum lunas') : ?>
                               <td style="color: red; font-weight: bold;"> BELUM LUNAS</td>
                               <td style="color: red; font-weight: bold;"> <?= $data['keterangan']; ?></td>
-                            <?php  else: ?>  
+                            <?php else : ?>
                               <td style="color: green; font-weight: bold;"> LUNAS</td>
                               <td style="color: green; font-weight: bold;"> Sudah Lunas</td>
-                              <?php endif; ?>
+                            <?php endif; ?>
                           </tr>
                           <?php $i++ ?>
                         <?php endforeach; ?>

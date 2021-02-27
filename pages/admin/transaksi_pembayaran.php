@@ -5,7 +5,17 @@ if (!isset($_SESSION["level"]) == "superadmin") {
   header("Location: ../login.php");
   exit;
 }
-$transaksi_bayar = tampil_data("SELECT * FROM transaksi_pembayaran ");
+$transaksi_bayar = tampil_data("SELECT
+      `transaksi_pembayaran`.*,
+      `kategori_kos`.`kategori_kos`
+      FROM
+      `transaksi_pembayaran`
+      INNER JOIN `transaksi_kos` ON `transaksi_pembayaran`.`kode_t_kamar` =
+      `transaksi_kos`.`kode_t_kamar`
+      INNER JOIN `kamar_kos` ON `transaksi_kos`.`kode_kamar` =
+      `kamar_kos`.`kode_kamar`
+      INNER JOIN `kategori_kos` ON `kamar_kos`.`kode_kategori` =
+      `kategori_kos`.`kode_kategori`");
 
 
 
@@ -13,19 +23,12 @@ $transaksi_bayar = tampil_data("SELECT * FROM transaksi_pembayaran ");
 if (isset($_POST["submit"])) {
 
   // cek apakah berhasil di tambahkan atau tidak
-  if (tambah_transaksi_pembayaran($_POST) > 0) {
-
-
-    echo "<script> 
-       alert('Data Berhasil Ditambahkan!');
-       document.location.href='transaksi_pembayaran.php';
-     </script>";
-  } else {
-    echo "<script> 
-       alert('Data Gagal Ditambahkan!');
-       document.location.href='transaksi_pembayaran.php';
-     </script>";
-  }
+  $tambah_transaksi = tambah_transaksi_pembayaran($_POST);
+  $pesan = $tambah_transaksi["pesan"];
+  echo "<script> 
+      alert('$pesan');
+      document.location.href='transaksi_pembayaran.php';
+    </script>";
 }
 ?>
 
@@ -135,8 +138,8 @@ if (isset($_POST["submit"])) {
                             <div class="card-body">
                               <div class="form-group">
                                 <input type="hidden" value="<?= $kodeBayar; ?>" name="kode_bayar">
-                                <input type="hidden" name="bulan" value=" <?php echo date('m'); ?>">
-                                <input type="hidden" name="tahun" value=" <?php echo date('Y'); ?>">
+                                <input type="hidden" name="bulan" value="<?php echo date('m'); ?>">
+                                <input type="hidden" name="tahun" value="<?php echo date('Y'); ?>">
                                 <input type="hidden" name="kode_kas" value="<?= $kodeKas; ?>">
                                 <input type="hidden" name="tgl_input" value="<?= date('Y-m-d')  ?>">
                                 <input type="hidden" name="kode_kamar" id="kode_kamar">
@@ -150,6 +153,8 @@ if (isset($_POST["submit"])) {
                                 </select>
                                 <input type="hidden" name="kode_akun" value="<?= $akun['kode_akun'] ?>">
                               </div>
+
+                              <input type="hidden" name="penginput" value="<?= $nama; ?>">
 
                               <div class="form-group">
                                 <label for="sumber">Kategori Kos</label>
@@ -266,7 +271,7 @@ if (isset($_POST["submit"])) {
                         <?php foreach ($transaksi_bayar as $data) : ?>
                           <tr>
                             <td><?= $i; ?></td>
-                            <td> <?= $data['nama']; ?></td>
+                            <td> <?= $data['penginput']; ?></td>
                             <td> <?= $data['kategori_kos']; ?></td>
                             <td> <?= $data['kode_kamar']; ?></td>
                             <td> <?= tgl_indo($data["tgl_bayar"]); ?></td>
